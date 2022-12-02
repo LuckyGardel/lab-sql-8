@@ -147,7 +147,26 @@ JOIN film_actor as fa2
 ON (fa1.film_id = fa2.film_id) AND (fa1.actor_id > fa2.actor_id)
 ORDER BY fa1.film_id ASC;
 
+-- In the option below I think we get actually the same result but with a better visualization of which actors have worked together displayed by the names. 
+
+SELECT CONCAT(a1.first_name,' ', a1.last_name) AS actor_1,
+    CONCAT(a2.first_name,' ', a2.last_name) AS actor_2,
+    f.title
+FROM
+    film_actor AS fa1
+        JOIN
+    film_actor AS fa2 ON (fa1.film_id = fa2.film_id)
+        AND (fa1.actor_id > fa2.actor_id)
+        JOIN
+    actor a1 ON (fa1.actor_id = a1.actor_id)
+        JOIN
+    actor a2 ON (fa2.actor_id = a2.actor_id)
+    join film f on (fa1.film_id = f.film_id)
+ORDER BY fa1.film_id ASC;
+
+
 -- 8. Get all pairs of customers that have rented the same film more than 3 times.
+
 
 
 -- 9. For each film, list actor that has acted in more films.
