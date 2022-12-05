@@ -167,6 +167,53 @@ ORDER BY fa1.film_id ASC;
 
 -- 8. Get all pairs of customers that have rented the same film more than 3 times.
 
+CREATE TEMPORARY TABLE t1 AS (
+SELECT i.film_id, r.rental_id, r.customer_id, r.inventory_id
+FROM rental r
+JOIN inventory i
+USING(inventory_id));
 
+CREATE TEMPORARY TABLE t2 AS (
+SELECT i.film_id, r.rental_id, r.customer_id, r.inventory_id
+FROM rental r
+JOIN inventory i
+USING(inventory_id));
+
+SELECT count(t1.film_id), t1.customer_id AS customer1, t2.customer_id AS customer2
+FROM t1
+JOIN t2
+ON t1.inventory_id = t2.inventory_id AND t1.customer_id > t2.customer_id
+GROUP BY t1.customer_id, t2.customer_id
+HAVING count(t1.film_id) > 3;
 
 -- 9. For each film, list actor that has acted in more films.
+
+CREATE TEMPORARY TABLE ta1 AS(
+SELECT actor_id, count(film_id) AS acted
+FROM film_actor
+GROUP BY actor_id);
+
+CREATE TEMPORARY TABLE ta2 AS(
+SELECT fa.film_id, max(ta1.acted) AS max_act
+	FROM film_actor fa
+	JOIN ta1
+	USING(actor_id)
+	GROUP BY film_id
+	ORDER BY film_id);
+
+select * from ta1;
+select * from ta2;
+
+SELECT f.title, concat(a.first_name, " ",a.last_name) AS most_starred_actor
+FROM film_actor
+JOIN ta1
+USING(actor_id)
+JOIN ta2
+USING(film_id)
+JOIN film f
+USING(film_id)
+JOIN actor a
+USING(actor_id)
+WHERE acted = max_act;
+
+
